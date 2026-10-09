@@ -1,0 +1,4 @@
+import photos from "../../lib/photo-credits.json";
+export default function PhotoCredits() {
+ return <main className="photo-credits"><a href="/">← Back to ClosetWise</a><p className="eyebrow">THE DEMO WARDROBE</p><h1>Real clothes. Real photography.</h1><p>Our sample wardrobe uses locally bundled photographs from Pexels. Some show clothes on models or alongside other pieces; outfit cards represent the named garment, rather than a virtual try-on. Your own uploaded photos remain private.</p><p>Images are used under the <a href="https://www.pexels.com/license/" target="_blank" rel="noreferrer">Pexels License</a>. Demo warmth and formality ratings are manually assigned examples.</p><div className="credits-grid">{photos.map(photo => <a key={photo.index} href={photo.source} target="_blank" rel="noreferrer"><strong>{photo.name}</strong><span>View original photo & photographer ↗</span></a>)}</div></main>;
+}

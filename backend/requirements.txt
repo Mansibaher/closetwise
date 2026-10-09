@@ -1,0 +1,17 @@
+fastapi==0.135.1
+uvicorn==0.41.0
+pydantic==2.12.5
+SQLAlchemy==2.0.48
+alembic==1.18.4
+psycopg[binary]==3.3.3
+Pillow==12.1.1
+python-multipart==0.0.22
+pwdlib[argon2]==0.3.0
+PyJWT==2.12.1
+httpx==0.28.1
+numpy==2.4.3
+boto3==1.42.68
+pytest==9.0.2
+hypothesis==6.151.9
+
+pillow-heif==1.8.0

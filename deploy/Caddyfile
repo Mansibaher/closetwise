@@ -1,0 +1,11 @@
+closetwise.example.com {
+    request_body {
+        max_size 9MB
+    }
+    header {
+        X-Frame-Options DENY
+        Referrer-Policy strict-origin-when-cross-origin
+        Permissions-Policy "camera=(), microphone=(), geolocation=()"
+    }
+    reverse_proxy 127.0.0.1:3000
+}

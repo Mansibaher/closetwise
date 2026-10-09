@@ -1,0 +1,52 @@
+name: ClosetWise checks
+on: [push, pull_request]
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17.9-alpine
+        env:
+          POSTGRES_DB: closetwise
+          POSTGRES_USER: closetwise
+          POSTGRES_PASSWORD: ci-password
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U closetwise"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - uses: actions/setup-node@v4
+        with: { node-version: "22.14.0", cache: npm, cache-dependency-path: frontend/package-lock.json }
+      - run: pip install -r backend/requirements-lock.txt
+      - run: python -m pytest -q
+        working-directory: backend
+      - name: PostgreSQL migration and persisted API smoke
+        working-directory: backend
+        env:
+          DATABASE_URL: postgresql+psycopg://closetwise:ci-password@localhost:5432/closetwise
+        run: |
+          python -m alembic upgrade head
+          python -m alembic check
+          python tools/smoke_postgres.py
+      - run: npm ci
+        working-directory: frontend
+      - run: npm run typecheck && npm run build && npx playwright install --with-deps chromium
+        working-directory: frontend
+      - name: Start backend and run browser flows against PostgreSQL
+        env:
+          DATABASE_URL: postgresql+psycopg://closetwise:ci-password@localhost:5432/closetwise
+        run: |
+          cd backend
+          python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 > /tmp/closetwise-api.log 2>&1 &
+          cd ../frontend
+          npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-artifacts
+          path: |
+            frontend/test-results/
+            docs/screenshots/
