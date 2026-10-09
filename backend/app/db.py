@@ -10,7 +10,6 @@ from sqlalchemy import (
     DateTime,
     Boolean,
     Integer,
-    UniqueConstraint,
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, sessionmaker
 
@@ -81,7 +80,7 @@ class Outfit(Base, Timestamp):
 
 class OutfitItem(Base):
     __tablename__ = "outfit_items"
-    __table_args__ = (UniqueConstraint("outfit_id", "slot"),)
+    # The composite primary key already guarantees one item per outfit slot.
     outfit_id: Mapped[str] = mapped_column(
         ForeignKey("outfits.id", ondelete="CASCADE"), primary_key=True
     )
